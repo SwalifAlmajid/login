@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html data-theme="cupcake">
+<head>
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui"></script>
+</head>
+<body class="bg-base-200 min-h-screen flex flex-col">
+    <header class="navbar bg-red-600 text-white shadow">
+        <div class="flex-1 px-2 text-xl font-bold">MyApp</div>
+        <div class="flex-none">
+            <a href="/logout" class="btn btn-sm btn-outline btn-light">Logout</a>
+        </div>
+    </header>
+    <main class="flex-grow flex flex-col items-center justify-center text-center">
+        <h1 class="text-4xl font-bold mb-4">Welcome, {{ user }}!</h1>
+        <p class="text-lg">You are now logged in.</p>
+    </main>
+    <footer class="footer p-4 bg-blue-700 text-white text-center shadow">
+        <div class="w-full">© 2025 MyApp. All rights reserved.</div>
+    </footer>
+</body>
+</html>

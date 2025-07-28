@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html data-theme="cupcake">
+<head>
+    <title>Sign Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui"></script>
+</head>
+<body class="bg-base-200 min-h-screen flex flex-col">
+    <header class="navbar bg-red-600 text-white shadow">
+        <div class="flex-1 px-2 text-xl font-bold">MyApp</div>
+    </header>
+    <main class="flex-grow flex items-center justify-center">
+        <form method="POST" action="/signup" class="p-6 bg-white rounded shadow w-80">
+            <h2 class="text-2xl font-bold mb-4">Sign Up</h2>
+            <input name="username" class="input input-bordered w-full mb-3" placeholder="Username" required>
+            <input name="password" type="password" class="input input-bordered w-full mb-3" placeholder="Password" required>
+            <select name="role" class="select select-bordered w-full mb-3" required>
+                <option value="" disabled selected>Select Role</option>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+                <option value="super_admin">Super Admin</option>
+            </select>
+            <button type="submit" class="btn btn-primary w-full mb-2">Sign Up</button>
+            <a href="/login" class="btn btn-outline btn-secondary w-full">Login</a>
+        </form>
+    </main>
+    <footer class="footer p-4 bg-blue-700 text-white text-center shadow">
+        <div class="w-full">© 2025 MyApp. All rights reserved.</div>
+    </footer>
+</body>
+</html>
