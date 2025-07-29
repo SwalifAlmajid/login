@@ -8,7 +8,7 @@
 <body class="bg-neutral-300 min-h-screen flex flex-col">
 
   <!-- Header -->
-  <header class="bg-[#0a1f44] text-white shadow h-20 flex items-center justify-center">
+  <header class="bg-[#00535e] text-white shadow h-20 flex items-center justify-center">
     <div class="text-2xl font-bold text-center">Eastern Province Cement Co.</div>
   </header>
 
@@ -22,16 +22,144 @@
 
       <div class="flex flex-wrap gap-6">
         <!-- Report Submission -->
-        <a href="/submit-report" 
-           class="flex-1 min-w-[200px] bg-slate-300 hover:bg-gray-400 text-black font-semibold rounded-lg py-4 text-center shadow-lg transition">
-          Submit Report
-        </a>
+<a href="#" id="openModalBtn" 
+   class="flex-1 min-w-[200px] bg-slate-300 hover:bg-gray-400 text-black font-semibold rounded-lg py-4 text-center shadow-lg transition">
+  Submit Report
+</a>
 
-        <!-- View Reports -->
-        <a href="/view-reports" 
-           class="flex-1 min-w-[200px] bg-slate-300 hover:bg-gray-400 text-black font-semibold rounded-lg py-4 text-center shadow-lg transition">
-          View My Reports
-        </a>
+<!-- Modal -->
+<div id="emailModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-lg shadow-lg w-96 p-6">
+    <h2 class="text-xl font-semibold mb-4">Submit Report</h2>
+    <form>
+<label class="block mb-2 font-medium" for="reportTitle">Report Title:</label>
+      <input id="reportTitle" type="text" class="w-full border border-gray-300 rounded px-3 py-2 mb-4" placeholder="Enter report title" required>
+      <!-- File input for uploading report -->
+      <label class="block mb-2 font-medium" for="reportFile">Upload Report File:</label>
+      <input id="reportFile" type="file" class="w-full border border-gray-300 rounded px-3 py-2 mb-4" required>
+
+      <div class="flex justify-end space-x-2">
+        <button type="button" id="closeModalBtn" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+        <button type="submit" class="px-4 py-2 bg-slate-300 text-black font-semibold rounded hover:bg-gray-400">Send</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  const openModalBtn = document.getElementById('openModalBtn');
+  const emailModal = document.getElementById('emailModal');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+
+  openModalBtn.addEventListener('click', (e) => {
+    e.preventDefault(); // prevent link navigation
+    emailModal.classList.remove('hidden');
+  });
+
+  closeModalBtn.addEventListener('click', () => {
+    emailModal.classList.add('hidden');
+  });
+
+  // Close modal if clicking outside modal content
+  emailModal.addEventListener('click', (e) => {
+    if (e.target === emailModal) {
+      emailModal.classList.add('hidden');
+    }
+  });
+</script>
+
+        <!-- View Reports Button -->
+<a href="#" id="viewReportsBtn"
+   class="flex-1 min-w-[200px] bg-slate-300 hover:bg-gray-400 text-black font-semibold rounded-lg py-4 text-center shadow-lg transition">
+  View My Reports
+</a>
+
+<!-- Reports List Modal -->
+<div id="reportsListModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-lg shadow-lg w-80 max-h-[70vh] overflow-auto p-6">
+    <h2 class="text-xl font-semibold mb-4">My Reports</h2>
+    <div id="reportsContainer" class="space-y-2">
+      <!-- Report labels inserted here by JS -->
+    </div>
+    <div class="flex justify-end mt-4">
+      <button id="closeReportsList" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Single Report View Modal -->
+<div id="singleReportModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-lg shadow-lg w-96 max-h-[80vh] overflow-auto p-6">
+    <h2 id="reportTitle" class="text-xl font-semibold mb-4">Report Title</h2>
+    <div id="reportContent" class="mb-4">
+      <!-- Report content (text or embed) will go here -->
+    </div>
+    <div class="flex justify-end">
+      <button id="closeSingleReport" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Dummy reports data (you'll replace with actual data)
+  const reports = [
+    { id: 1, title: "Report July 2025", content: "This is the detailed content for July 2025 report." },
+    { id: 2, title: "Report August 2025", content: "Details and summary of August report here." },
+    { id: 3, title: "Report September 2025", content: "September report's content shown here." },
+  ];
+
+  const viewReportsBtn = document.getElementById('viewReportsBtn');
+  const reportsListModal = document.getElementById('reportsListModal');
+  const singleReportModal = document.getElementById('singleReportModal');
+  const reportsContainer = document.getElementById('reportsContainer');
+  const reportTitle = document.getElementById('reportTitle');
+  const reportContent = document.getElementById('reportContent');
+  const closeReportsList = document.getElementById('closeReportsList');
+  const closeSingleReport = document.getElementById('closeSingleReport');
+
+  // Open reports list modal
+  viewReportsBtn.addEventListener('click', e => {
+    e.preventDefault();
+    reportsContainer.innerHTML = ''; // Clear previous list
+
+    reports.forEach(report => {
+      const label = document.createElement('button');
+      label.textContent = report.title;
+      label.className = "w-full text-left px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded cursor-pointer";
+      label.addEventListener('click', () => {
+        // Show single report modal with content
+        reportTitle.textContent = report.title;
+        reportContent.textContent = report.content;
+        singleReportModal.classList.remove('hidden');
+      });
+      reportsContainer.appendChild(label);
+    });
+
+    reportsListModal.classList.remove('hidden');
+  });
+
+  // Close reports list modal
+  closeReportsList.addEventListener('click', () => {
+    reportsListModal.classList.add('hidden');
+  });
+
+  // Close single report modal
+  closeSingleReport.addEventListener('click', () => {
+    singleReportModal.classList.add('hidden');
+  });
+
+  // Optional: close modals if clicking outside content
+  reportsListModal.addEventListener('click', e => {
+    if (e.target === reportsListModal) {
+      reportsListModal.classList.add('hidden');
+    }
+  });
+
+  singleReportModal.addEventListener('click', e => {
+    if (e.target === singleReportModal) {
+      singleReportModal.classList.add('hidden');
+    }
+  });
+</script>
 
         <!-- Profile -->
         <a href="/profile" 
@@ -50,7 +178,7 @@
   </main>
 
   <!-- Footer -->
-  <footer class="bg-[#0a1f44] text-white text-center shadow h-16 flex items-center justify-center">
+  <footer class="bg-[#00535e] text-white text-center shadow h-16 flex items-center justify-center">
     <div class="text-sm">© 2025 Eastern Province Cement Company. All rights reserved.</div>
   </footer>
 
