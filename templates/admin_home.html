@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Home - Eastern Province Cement Co.</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-neutral-300 min-h-screen flex flex-col">
+
+  <header class="bg-[#0a1f44] text-white shadow h-20 flex items-center justify-center">
+    <div class="text-2xl font-bold">Eastern Province Cement Co.</div>
+  </header>
+
+  <main class="flex-grow p-8 max-w-4xl mx-auto bg-white rounded shadow mt-8">
+
+    <h1 class="text-3xl font-bold mb-6 text-[#0a1f44]">Welcome, {{ user.username }} (Admin)</h1>
+
+    <section>
+      <h2 class="text-xl font-semibold mb-4">List of Trainees</h2>
+
+      {% if trainees %}
+      <table class="w-full border-collapse border border-gray-300">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2 text-left">ID</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Username</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for trainee in trainees %}
+          <tr class="hover:bg-gray-100">
+            <td class="border border-gray-300 px-4 py-2">{{ trainee.id }}</td>
+            <td class="border border-gray-300 px-4 py-2">{{ trainee.username }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No trainees found.</p>
+      {% endif %}
+    </section>
+
+  </main>
+
+  <footer class="bg-[#0a1f44] text-white text-center h-16 flex items-center justify-center">
+    <div class="text-sm">© 2025 Eastern Province Cement Company. All rights reserved.</div>
+  </footer>
+
+</body>
+</html>

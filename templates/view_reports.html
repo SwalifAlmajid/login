@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reports for {{ trainee.username }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-neutral-300 min-h-screen flex flex-col">
+
+  <header class="bg-[#0a1f44] text-white shadow h-20 flex items-center justify-center">
+    <div class="text-2xl font-bold text-center">Reports - {{ trainee.username }}</div>
+  </header>
+
+  <main class="flex-grow flex flex-col items-center justify-start px-6 py-8 gap-6">
+
+    <section class="w-full max-w-4xl bg-white rounded-lg shadow p-8">
+      <h2 class="text-xl font-semibold mb-4">Reports</h2>
+
+      {% if reports %}
+      <ul class="list-disc list-inside">
+        {% for report in reports %}
+        <li>{{ report.title }} - {{ report.date_submitted }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No reports submitted yet.</p>
+      {% endif %}
+
+      <a href="{{ url_for('admin_home') }}" class="mt-8 inline-block bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded px-6 py-3">Back to Trainees</a>
+    </section>
+
+  </main>
+
+  <footer class="bg-[#0a1f44] text-white text-center shadow h-16 flex items-center justify-center">
+    <div class="text-sm">© 2025 Eastern Province Cement Company. All rights reserved.</div>
+  </footer>
+
+</body>
+</html>

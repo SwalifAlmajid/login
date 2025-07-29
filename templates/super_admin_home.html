@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Super Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-neutral-300 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-[#0a1f44] text-white shadow h-20 flex items-center justify-center">
+    <div class="text-2xl font-bold text-center">Eastern Province Cement Co. - Super Admin</div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex flex-col items-center justify-start px-6 py-8 gap-8">
+
+    <section class="w-full max-w-4xl bg-white rounded-lg shadow p-8">
+      <h1 class="text-3xl font-bold mb-6 text-[#0a1f44]">Welcome, {{ user.username }}!</h1>
+
+      <h2 class="text-xl font-semibold mb-4">Manage Admins and Users</h2>
+      <table class="w-full text-left border-collapse border border-gray-300">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border border-gray-300 p-2">Username</th>
+            <th class="border border-gray-300 p-2">Role</th>
+            <th class="border border-gray-300 p-2">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr class="hover:bg-gray-100">
+            <td class="border border-gray-300 p-2">{{ u.username }}</td>
+            <td class="border border-gray-300 p-2">{{ u.role }}</td>
+            <td class="border border-gray-300 p-2">
+              {% if u.username != user.username %}
+              <form method="POST" action="{{ url_for('delete_user', user_id=u.id) }}" onsubmit="return confirm('Are you sure you want to delete {{ u.username }}?');">
+                <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">Delete</button>
+              </form>
+              {% else %}
+              <!-- Can't delete yourself -->
+              <span class="text-gray-400 italic">You</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <a href="{{ url_for('logout') }}" class="mt-8 inline-block bg-red-600 hover:bg-red-700 text-white font-semibold rounded px-6 py-3">Logout</a>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-[#0a1f44] text-white text-center shadow h-16 flex items-center justify-center">
+    <div class="text-sm">© 2025 Eastern Province Cement Company. All rights reserved.</div>
+  </footer>
+
+</body>
+</html>
