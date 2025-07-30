@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Trainee Home - Eastern Province Cement Co.</title>
@@ -7,174 +7,220 @@
 </head>
 <body class="bg-neutral-300 min-h-screen flex flex-col">
 
-    {% include 'header.html' %}
+  <!-- Header -->
+  <header class="bg-[#00535e] text-white shadow h-20 flex items-center justify-center">
+    <div class="text-2xl font-bold text-center">Eastern Province Cement Co.</div>
+  </header>
 
   <!-- Main Content -->
   <main class="flex-grow flex flex-col items-center justify-start px-6 py-8 gap-8">
 
-    <!-- Welcome -->
+    <!-- Welcome Section -->
     <section class="w-full max-w-6x6 h-240 bg-white rounded-lg shadow p-8">
       <h1 class="text-4xl font-bold mb-2 text-[#0a1f44]">Welcome, {{ user.username }}!</h1>
-      <p class="text-gray-700 mb-6">Role: <strong>{{ user.role | capitalize }}</strong></p>
+      <p class="text-gray-700 mb-6">Role: <strong>{{ session['role'] | capitalize }}</strong></p>
 
       <div class="flex flex-wrap gap-6">
-        <!-- Report Submission -->
-<a href="#" id="openModalBtn" 
-   class="flex-1 min-w-[200px] bg-slate-300 hover:bg-gray-400 text-black font-semibold rounded-lg py-4 text-center shadow-lg transition">
-  Submit Report
-</a>
 
-<!-- Modal -->
-<div id="emailModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-  <div class="bg-white rounded-lg shadow-lg w-96 p-6">
-    <h2 class="text-xl font-semibold mb-4">Submit Report</h2>
-    <form>
-<label class="block mb-2 font-medium" for="reportTitle">Report Title:</label>
-      <input id="reportTitle" type="text" class="w-full border border-gray-300 rounded px-3 py-2 mb-4" placeholder="Enter report title" required>
-      <!-- File input for uploading report -->
-      <label class="block mb-2 font-medium" for="reportFile">Upload Report File:</label>
-      <input id="reportFile" type="file" class="w-full border border-gray-300 rounded px-3 py-2 mb-4" required>
+        <!-- Submit Report Button -->
+        <a href="#" id="openModalBtn"
+           class="flex-1 min-w-[200px] bg-slate-300 hover:bg-gray-400 text-black font-semibold rounded-lg py-4 text-center shadow-lg transition">
+          Submit Report
+        </a>
 
-      <div class="flex justify-end space-x-2">
-        <button type="button" id="closeModalBtn" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
-        <button type="submit" class="px-4 py-2 bg-slate-300 text-black font-semibold rounded hover:bg-gray-400">Send</button>
+        <!-- Submit Report Modal -->
+        <div id="emailModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+          <div class="bg-white rounded-lg shadow-lg w-96 p-6">
+            <h2 class="text-xl font-semibold mb-4">Submit Report</h2>
+            <form id="submitReportForm" action="/submit-report" method="POST" enctype="multipart/form-data">
+              <label class="block mb-2 font-medium" for="reportTitle">Report Title:</label>
+              <input id="reportTitle" name="reportTitle" type="text"
+                     class="w-full border border-gray-300 rounded px-3 py-2 mb-4"
+                     placeholder="Enter report title" required>
+
+              <label class="block mb-2 font-medium" for="reportFile">Upload Report File:</label>
+              <input id="reportFile" name="reportFile" type="file"
+                     class="w-full border border-gray-300 rounded px-3 py-2 mb-4" required>
+
+              <div class="flex justify-end space-x-2">
+                <button type="button" id="closeModalBtn" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-slate-300 text-black font-semibold rounded hover:bg-gray-400">Send</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- View Reports Button -->
+        <a href="#" id="viewReportsBtn"
+           class="flex-1 min-w-[200px] bg-slate-300 hover:bg-gray-400 text-black font-semibold rounded-lg py-4 text-center shadow-lg transition">
+          View My Reports
+        </a>
+
+        <!-- Reports List Modal -->
+        <div id="reportsListModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+          <div class="bg-white rounded-lg shadow-lg w-[90%] max-w-4xl max-h-[80vh] overflow-auto p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-2xl font-semibold">My Reports</h2>
+              <button id="closeReportsList" class="text-red-500 text-2xl font-bold hover:text-red-700">&times;</button>
+            </div>
+
+            <table class="w-full table-auto border border-gray-300">
+              <thead class="bg-gray-100">
+                <tr>
+                  <th class="border px-4 py-2">Report ID</th>
+                  <th class="border px-4 py-2">Title</th>
+                  <th class="border px-4 py-2">Download</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for report in reports %}
+                <tr>
+                  <td class="border px-4 py-2">{{ report.id }}</td>
+                  <td class="border px-4 py-2">{{ report.title }}</td>
+                  <td class="border px-4 py-2 text-center">
+                    <a href="{{ url_for('download_report', report_id=report.id) }}"
+                       class="bg-blue-600 hover:bg-blue-800 text-white px-3 py-1 rounded">
+                      Browse
+                    </a>
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="3" class="text-center py-4">No reports found.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Profile Button (opens modal) -->
+        <a href="#" id="openProfileModal"
+          class="flex-1 min-w-[200px] bg-slate-300 hover:bg-gray-400 text-black font-semibold rounded-lg py-4 text-center shadow-lg transition">
+          My Profile
+        </a>
+
+        <!-- Profile Modal -->
+<div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold text-gray-800">My Profile</h2>
+      <button id="closeProfileModal" class="text-red-500 text-2xl font-bold hover:text-red-700">&times;</button>
+    </div>
+    <form class="space-y-4" method="POST" action="/update-profile">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Username</label>
+        <input type="text" value="{{ user.username }}" disabled
+               class="mt-1 block w-full rounded-md bg-gray-100 border border-gray-300 px-3 py-2 text-gray-700 cursor-not-allowed">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Role</label>
+        <input type="text" value="{{ session['role'] | capitalize }}" disabled
+               class="mt-1 block w-full rounded-md bg-gray-100 border border-gray-300 px-3 py-2 text-gray-700 cursor-not-allowed">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Email</label>
+        <input type="email" name="email" value="{{ user.email or '' }}"
+               class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+        <input type="text" name="phone" value="{{ user.phone or '' }}"
+               class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">University</label>
+        <input type="text" name="university" value="{{ user.university or '' }}"
+               class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700">
+      </div>
+      <div class="flex justify-end space-x-2 pt-4">
+        <button type="button" id="closeProfileModal" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
       </div>
     </form>
   </div>
 </div>
-<script>
-  const openModalBtn = document.getElementById('openModalBtn');
-  const emailModal = document.getElementById('emailModal');
-  const closeModalBtn = document.getElementById('closeModalBtn');
 
-  openModalBtn.addEventListener('click', (e) => {
-    e.preventDefault(); // prevent link navigation
-    emailModal.classList.remove('hidden');
-  });
 
-  closeModalBtn.addEventListener('click', () => {
-    emailModal.classList.add('hidden');
-  });
 
-  // Close modal if clicking outside modal content
-  emailModal.addEventListener('click', (e) => {
-    if (e.target === emailModal) {
-      emailModal.classList.add('hidden');
-    }
-  });
-</script>
-
-        <!-- View Reports Button -->
-<a href="#" id="viewReportsBtn"
-   class="flex-1 min-w-[200px] bg-slate-300 hover:bg-gray-400 text-black font-semibold rounded-lg py-4 text-center shadow-lg transition">
-  View My Reports
-</a>
-
-<!-- Reports List Modal -->
-<div id="reportsListModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-  <div class="bg-white rounded-lg shadow-lg w-80 max-h-[70vh] overflow-auto p-6">
-    <h2 class="text-xl font-semibold mb-4">My Reports</h2>
-    <div id="reportsContainer" class="space-y-2">
-      <!-- Report labels inserted here by JS -->
-    </div>
-    <div class="flex justify-end mt-4">
-      <button id="closeReportsList" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- Single Report View Modal -->
-<div id="singleReportModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-  <div class="bg-white rounded-lg shadow-lg w-96 max-h-[80vh] overflow-auto p-6">
-    <h2 id="reportTitle" class="text-xl font-semibold mb-4">Report Title</h2>
-    <div id="reportContent" class="mb-4">
-      <!-- Report content (text or embed) will go here -->
-    </div>
-    <div class="flex justify-end">
-      <button id="closeSingleReport" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Close</button>
-    </div>
-  </div>
-</div>
-
-<script>
-  // Dummy reports data (you'll replace with actual data)
-  const reports = [
-    { id: 1, title: "Report July 2025", content: "This is the detailed content for July 2025 report." },
-    { id: 2, title: "Report August 2025", content: "Details and summary of August report here." },
-    { id: 3, title: "Report September 2025", content: "September report's content shown here." },
-  ];
-
-  const viewReportsBtn = document.getElementById('viewReportsBtn');
-  const reportsListModal = document.getElementById('reportsListModal');
-  const singleReportModal = document.getElementById('singleReportModal');
-  const reportsContainer = document.getElementById('reportsContainer');
-  const reportTitle = document.getElementById('reportTitle');
-  const reportContent = document.getElementById('reportContent');
-  const closeReportsList = document.getElementById('closeReportsList');
-  const closeSingleReport = document.getElementById('closeSingleReport');
-
-  // Open reports list modal
-  viewReportsBtn.addEventListener('click', e => {
-    e.preventDefault();
-    reportsContainer.innerHTML = ''; // Clear previous list
-
-    reports.forEach(report => {
-      const label = document.createElement('button');
-      label.textContent = report.title;
-      label.className = "w-full text-left px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded cursor-pointer";
-      label.addEventListener('click', () => {
-        // Show single report modal with content
-        reportTitle.textContent = report.title;
-        reportContent.textContent = report.content;
-        singleReportModal.classList.remove('hidden');
-      });
-      reportsContainer.appendChild(label);
-    });
-
-    reportsListModal.classList.remove('hidden');
-  });
-
-  // Close reports list modal
-  closeReportsList.addEventListener('click', () => {
-    reportsListModal.classList.add('hidden');
-  });
-
-  // Close single report modal
-  closeSingleReport.addEventListener('click', () => {
-    singleReportModal.classList.add('hidden');
-  });
-
-  // Optional: close modals if clicking outside content
-  reportsListModal.addEventListener('click', e => {
-    if (e.target === reportsListModal) {
-      reportsListModal.classList.add('hidden');
-    }
-  });
-
-  singleReportModal.addEventListener('click', e => {
-    if (e.target === singleReportModal) {
-      singleReportModal.classList.add('hidden');
-    }
-  });
-</script>
-
-        <!-- Profile -->
-        <a href="/profile" 
-           class="flex-1 min-w-[200px] bg-slate-300 hover:gray-400 text-black font-semibold rounded-lg py-4 text-center shadow-lg transition">
-          My Profile
-        </a>
 
         <!-- Logout -->
-        <a href="{{ url_for('logout') }}" 
+        <a href="{{ url_for('logout') }}"
            class="flex-1 min-w-[200px] bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg py-4 text-center shadow-lg transition">
           Logout
         </a>
       </div>
     </section>
-
   </main>
 
-  {% include 'footer.html' %}
+  <!-- Footer -->
+  <footer class="bg-[#00535e] text-white text-center shadow h-16 flex items-center justify-center">
+    <div class="text-sm">© 2025 Eastern Province Cement Company. All rights reserved.</div>
+  </footer>
+      
+  <!-- Modal Scripts -->
+  <script>
+    // Submit Report Modal
+    const openModalBtn = document.getElementById('openModalBtn');
+    const emailModal = document.getElementById('emailModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    openModalBtn.addEventListener('click', e => {
+      e.preventDefault();
+      emailModal.classList.remove('hidden');
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      emailModal.classList.add('hidden');
+    });
+
+    emailModal.addEventListener('click', e => {
+      if (e.target === emailModal) {
+        emailModal.classList.add('hidden');
+      }
+    });
+
+    // View Reports Modal
+    const viewReportsBtn = document.getElementById('viewReportsBtn');
+    const reportsListModal = document.getElementById('reportsListModal');
+    const closeReportsList = document.getElementById('closeReportsList');
+
+    viewReportsBtn.addEventListener('click', e => {
+      e.preventDefault();
+      reportsListModal.classList.remove('hidden');
+    });
+
+    closeReportsList.addEventListener('click', () => {
+      reportsListModal.classList.add('hidden');
+    });
+
+    reportsListModal.addEventListener('click', e => {
+      if (e.target === reportsListModal) {
+        reportsListModal.classList.add('hidden');
+      }
+    });
+
+          // Profile Modal Logic
+      const openProfileModal = document.getElementById('openProfileModal');
+      const profileModal = document.getElementById('profileModal');
+      const closeProfileModal = document.getElementById('closeProfileModal');
+
+      openProfileModal.addEventListener('click', e => {
+        e.preventDefault();
+        profileModal.classList.remove('hidden');
+      });
+
+      closeProfileModal.addEventListener('click', () => {
+        profileModal.classList.add('hidden');
+      });
+
+      profileModal.addEventListener('click', e => {
+        if (e.target === profileModal) {
+          profileModal.classList.add('hidden');
+        }
+      });
+
+  </script>
 
 </body>
 </html>

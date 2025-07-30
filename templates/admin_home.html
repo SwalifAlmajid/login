@@ -7,40 +7,162 @@
 </head>
 <body class="bg-neutral-300 min-h-screen flex flex-col">
 
-    {% include 'header.html' %}
+  {% include 'header.html' %}
 
-  <main class="flex-grow p-8 max-w-4xl mx-auto bg-white rounded shadow mt-8">
+  <div class="flex flex-grow min-h-[calc(100vh-4rem)]">
 
-    <h1 class="text-3xl font-bold mb-6 text-[#0a1f44]">Welcome, {{ user.username }} (Admin)</h1>
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md p-6 overflow-y-auto">
+      <h2 class="text-xl font-semibold mb-4 text-[#0a1f44] border-b border-gray-300 pb-2">
+        List of Trainees
+      </h2>
 
-    <section>
-      <h2 class="text-xl font-semibold mb-4">List of Trainees</h2>
+      <!-- 🔍 Search Input -->
+      <input 
+        type="text" 
+        id="searchInput"
+        placeholder="Search trainees..." 
+        class="w-full px-3 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
 
+      <!-- Trainees List -->
       {% if trainees %}
-      <table class="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr class="bg-gray-200">
-            <th class="border border-gray-300 px-4 py-2 text-left">ID</th>
-            <th class="border border-gray-300 px-4 py-2 text-left">Username</th>
-          </tr>
-        </thead>
-        <tbody>
+        <ul id="traineesList" class="space-y-2">
           {% for trainee in trainees %}
-          <tr class="hover:bg-gray-100">
-            <td class="border border-gray-300 px-4 py-2">{{ trainee.id }}</td>
-            <td class="border border-gray-300 px-4 py-2">{{ trainee.username }}</td>
-          </tr>
+            <li class="p-2 border rounded hover:bg-gray-100 cursor-pointer"
+                onclick="openTraineeModal({{ trainee.id }})">
+              <span class="font-medium">{{ trainee.id }}.</span> {{ trainee.username }}
+            </li>
           {% endfor %}
-        </tbody>
-      </table>
+        </ul>
       {% else %}
-      <p>No trainees found.</p>
+        <p>No trainees found.</p>
       {% endif %}
-    </section>
+    </aside>
 
-  </main>
+    <!-- Main Content -->
+    <main class="flex-grow p-8 relative">
+      
+      <!-- Profile Button -->
+      <div class="absolute top-4 right-4">
+        <a href="/admin/profile" class="bg-[#0a1f44] text-white px-4 py-2 rounded hover:bg-[#122d65] transition">
+          Profile
+        </a>
+      </div>
 
-    {% include 'footer.html' %}
+      <h1 class="text-3xl font-bold mb-6 text-[#0a1f44]">
+        Welcome, {{ user.username }} (Admin)
+      </h1>
 
+      <p>This is your dashboard main content area.</p>
+      
+    </main>
+  </div>
+
+  <!-- Trainee Profile & Reports Modal -->
+  <div id="traineeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 max-h-[90vh] overflow-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-semibold text-[#0a1f44]">Trainee Details</h2>
+        <button onclick="closeTraineeModal()" class="text-red-500 text-2xl font-bold hover:text-red-700">&times;</button>
+      </div>
+
+      <!-- Profile Info -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold mb-2 text-gray-700">Profile Information</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-800">
+          <p><strong>Username:</strong> <span id="modalUsername">...</span></p>
+          <p><strong>Email:</strong> <span id="modalEmail">...</span></p>
+          <p><strong>Phone:</strong> <span id="modalPhone">...</span></p>
+          <p><strong>University:</strong> <span id="modalUniversity">...</span></p>
+        </div>
+      </div>
+
+      <!-- Report Table -->
+      <div>
+        <h3 class="text-lg font-semibold mb-2 text-gray-700">Reports</h3>
+        <table class="w-full table-auto border border-gray-300 text-sm">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-4 py-2 text-left">ID</th>
+              <th class="border px-4 py-2 text-left">Title</th>
+              <th class="border px-4 py-2 text-left">Download</th>
+            </tr>
+          </thead>
+          <tbody id="modalReportsBody">
+            <tr>
+              <td colspan="3" class="text-center py-4 text-gray-500">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Search trainees in sidebar
+  const searchInput = document.getElementById('searchInput');
+  const traineesList = document.getElementById('traineesList');
+  const traineeItems = traineesList ? traineesList.querySelectorAll('li') : [];
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase();
+    traineeItems.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      item.style.display = text.includes(query) ? '' : 'none';
+    });
+  });
+
+  // Open trainee modal and load info + reports
+  function openTraineeModal(traineeId) {
+    fetch(`/admin/trainee-info/${traineeId}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('modalUsername').textContent = data.username || '—';
+        document.getElementById('modalEmail').textContent = data.email || '—';
+        document.getElementById('modalPhone').textContent = data.phone || '—';
+        document.getElementById('modalUniversity').textContent = data.university || '—';
+
+        const reportsBody = document.getElementById('modalReportsBody');
+        reportsBody.innerHTML = '';
+
+        if (data.reports.length === 0) {
+          reportsBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-gray-500">No reports submitted.</td></tr>`;
+        } else {
+          data.reports.forEach(report => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td class="border px-4 py-2">${report.id}</td>
+              <td class="border px-4 py-2">${report.title}</td>
+              <td class="border px-4 py-2">
+                <button onclick="downloadReport(${report.id})" 
+                        class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                  Browse
+                </button>
+              </td>
+            `;
+            reportsBody.appendChild(row);
+          });
+        }
+
+        document.getElementById('traineeModal').classList.remove('hidden');
+      })
+      .catch(() => {
+        alert('Failed to load trainee data.');
+      });
+  }
+
+  // Close modal
+  function closeTraineeModal() {
+    document.getElementById('traineeModal').classList.add('hidden');
+  }
+
+  // Download report handler
+  function downloadReport(reportId) {
+    window.location.href = `/download_report/${reportId}`;
+  }
+</script>
+
+  {% include 'footer.html' %}
 </body>
 </html>
