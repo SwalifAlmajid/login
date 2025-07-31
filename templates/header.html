@@ -1,4 +1,20 @@
-<!-- Header -->
-    <header class="bg-[#00535e] text-white shadow h-20 flex items-center justify-center">
-        <div class="text-2xl font-bold text-center">Eastern Province Cement Co.</div>
-    </header>
+<header class="bg-[#0a1f44] text-white shadow h-20 flex items-center justify-between px-6">
+  <!-- Logo -->
+  <div class="flex items-center space-x-3">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" class="h-12 w-auto" />
+    <div class="text-2xl font-bold">Eastern Province Cement Co.</div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex items-center space-x-6 text-lg font-semibold">
+    {% if session.get('user') and session.get('role') %}
+      <!-- Logged in -->
+      <a href="{{ url_for(session['role'] + '_home') }}" class="hover:underline">Home</a>
+      <a href="{{ url_for('logout') }}" class="hover:underline text-red-300">Logout</a>
+    {% else %}
+      <!-- Not logged in -->
+      <a href="{{ url_for('login') }}" class="hover:underline">Login</a>
+      <a href="{{ url_for('signup') }}" class="hover:underline">Sign Up</a>
+    {% endif %}
+  </nav>
+</header>
