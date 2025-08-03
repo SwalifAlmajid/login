@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cupcake">
+<head>
+  <meta charset="UTF-8" />
+  <title>Upload Course Guide - Eastern Province Cement Co.</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('manageGuidesSidebar');
+      sidebar.classList.toggle('hidden');
+    }
+  </script>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+
+  {% include 'header.html' %}
+
+  <main class="flex-grow container mx-auto px-6 py-10 max-w-5xl relative">
+
+    <h1 class="text-3xl font-bold text-[#0a1f44] mb-8 text-center">Upload New Course Guide</h1>
+
+    <!-- Upload Form -->
+    <form action="{{ url_for('course_guide_upload') }}" method="POST" enctype="multipart/form-data"
+          class="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto mb-10">
+      <div class="mb-4">
+        <label for="title" class="block mb-2 font-semibold text-gray-700">Guide Title</label>
+        <input type="text" id="title" name="title" required
+               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0a1f44]" />
+      </div>
+      <div class="mb-4">
+        <label for="file" class="block mb-2 font-semibold text-gray-700">Select File</label>
+        <input type="file" id="file" name="file" accept=".pdf,.doc,.docx" required
+               class="w-full" />
+      </div>
+      <button type="submit"
+              class="bg-[#0a1f44] text-white font-semibold px-6 py-3 rounded shadow hover:bg-[#122d65] transition-colors duration-300">
+        Upload Guide
+      </button>
+    </form>
+
+    <!-- Button to toggle sidebar -->
+    <div class="text-center mb-6">
+      <button onclick="toggleSidebar()"
+              class="bg-[#0a1f44] text-white font-semibold px-5 py-2 rounded shadow hover:bg-[#122d65] transition-colors duration-300">
+        Manage Uploaded Guides
+      </button>
+    </div>
+
+    <!-- Sidebar / Popup -->
+    <aside id="manageGuidesSidebar"
+           class="hidden fixed top-0 right-0 h-full w-96 bg-white shadow-lg border-l border-gray-300 overflow-y-auto z-50"
+           style="max-height: 100vh;">
+      <div class="p-6 flex items-center justify-between border-b border-gray-200 sticky top-0 bg-white z-50">
+        <h2 class="text-xl font-bold text-[#0a1f44]">Uploaded Guides</h2>
+        <button onclick="toggleSidebar()" aria-label="Close sidebar"
+                class="text-gray-600 hover:text-gray-900 text-2xl font-bold">&times;</button>
+      </div>
+
+      {% if guides %}
+      <table class="w-full table-auto border-collapse text-left">
+        <thead>
+          <tr class="bg-gray-100 text-gray-700 sticky top-[54px] z-40">
+            <th class="px-4 py-3 border-b border-gray-300">#</th>
+            <th class="px-4 py-3 border-b border-gray-300">Title</th>
+            <th class="px-4 py-3 border-b border-gray-300">Uploaded At</th>
+            <th class="px-4 py-3 border-b border-gray-300 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for guide in guides %}
+          <tr class="hover:bg-gray-50">
+            <td class="border-b px-4 py-2">{{ loop.index }}</td>
+            <td class="border-b px-4 py-2 font-medium">{{ guide.title }}</td>
+            <td class="border-b px-4 py-2">{{ guide.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td class="border-b px-4 py-2 text-center space-x-2">
+              <a href="{{ url_for('download_course_guide', guide_id=guide.id) }}"
+                 class="text-blue-600 hover:underline font-semibold">Download</a>
+              <form method="POST" action="{{ url_for('delete_course_guide', guide_id=guide.id) }}" 
+                    class="inline" onsubmit="return confirm('Are you sure you want to delete this guide?');">
+                <button type="submit"
+                        class="text-red-600 hover:underline font-semibold">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="p-6 text-center text-gray-500">No guides uploaded yet.</p>
+      {% endif %}
+    </aside>
+
+  </main>
+
+  {% include 'footer.html' %}
+</body>
+</html>

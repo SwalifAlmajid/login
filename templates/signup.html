@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="cupcake">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Sign Up - Eastern Province Cement Co.</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/daisyui"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Up - Eastern Province Cement Co.</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/daisyui"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body class="bg-neutral-300 min-h-screen flex flex-col">
 
@@ -47,23 +47,24 @@
       <!-- Role Select -->
       <label for="role" class="block mb-1 font-semibold text-gray-700">Select Role</label>
       <select id="role" name="role" required
-              class="select select-bordered w-full mb-8 focus:ring-[#0a1f44] focus:border-[#0a1f44]">
-        <option value="" disabled selected>Choose a role</option>
+              class="w-full border border-gray-300 rounded px-3 py-2 mb-6 focus:outline-none focus:ring-2 focus:ring-[#0a1f44]">
+        <option value="" disabled selected>Select a role</option>
         <option value="superadmin">Super Admin</option>
         <option value="admin">Admin</option>
         <option value="trainee">Trainee</option>
       </select>
-        <!-- Department Dropdown -->
-        <div class="mb-4">
-        <label for="department" class="block text-sm font-medium text-gray-700 mb-1">Department</label>
-        <select id="department" name="department" required
-                class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">-- Select Department --</option>
-            {% for dept in departments %}
+
+      <!-- Department Dropdown -->
+      <div id="departmentDiv" style="display: none;">
+        <label for="department" class="block mb-2 font-medium text-gray-700">Department</label>
+        <select name="department" id="department"
+                class="w-full border border-gray-300 rounded px-3 py-2 mb-6 focus:outline-none focus:ring-2 focus:ring-[#0a1f44]">
+          <option value="" disabled selected>Select a department</option>
+          {% for dept in departments %}
             <option value="{{ dept.id }}">{{ dept.name }}</option>
-            {% endfor %}
+          {% endfor %}
         </select>
-        </div>
+      </div>
 
       <!-- Sign Up Button -->
       <button type="submit"
@@ -81,6 +82,17 @@
   </main>
 
   {% include 'footer.html' %}
+
+  <!-- Show/hide department dropdown based on role -->
+  <script>
+    const roleSelect = document.getElementById("role");
+    const deptDiv = document.getElementById("departmentDiv");
+
+    roleSelect.addEventListener("change", function () {
+      const role = this.value;
+      deptDiv.style.display = (role === "admin" || role === "trainee") ? "block" : "none";
+    });
+  </script>
 
 </body>
 </html>

@@ -1,180 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="cupcake">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Home - Eastern Province Cement Co.</title>
+  <title>Admin Dashboard - Eastern Province Cement Co.</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#f9fafb] min-h-screen flex flex-col">
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
 
   {% include 'header.html' %}
 
-  <div class="flex flex-grow min-h-[calc(100vh-4rem)]">
+  <main class="flex-grow container mx-auto px-6 py-10 max-w-7xl">
+    <h1 class="text-3xl font-bold text-center text-[#0a1f44] mb-6">Welcome, {{ user.username }}</h1>
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-md p-6 overflow-y-auto border-r border-gray-200">
-      <h2 class="text-xl font-semibold mb-4 text-[#0a1f44] border-b border-gray-300 pb-2">
-        List of Trainees ({{ total_trainees }})
-      </h2>
+    <!-- Upload Guide Button -->
+    <div class="flex justify-center mb-10">
+      <a href="{{ url_for('course_guide_upload') }}"
+         class="inline-block bg-[#0a1f44] hover:bg-[#122d65] text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-colors duration-300">
+        Upload New Guide
+      </a>
+    </div>
 
-      <!-- Search Input -->
-      <input 
-        type="text" 
-        id="searchInput"
-        placeholder="Search trainees..." 
-        class="w-full px-3 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#1f3b8b]"
-      >
-
-      <!-- Trainees List -->
-      {% if trainees %}
-        <ul id="traineesList" class="space-y-2">
-          {% for trainee in trainees %}
-            <li 
-              class="p-2 border rounded hover:bg-[#e0e7ff] cursor-pointer transition duration-150"
-              onclick="openTraineeModal({{ trainee.id }})" 
-              title="Click to view details"
-            >
-              <span class="font-medium text-[#0a1f44]">{{ trainee.id }}.</span> {{ trainee.username }}
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p class="text-gray-500">No trainees found.</p>
-      {% endif %}
-    </aside>
-
-    <!-- Main Content -->
-    <main class="flex-grow p-10 relative bg-white shadow-md rounded-lg m-6">
-
-      <!-- Profile Button -->
-      <div class="absolute top-6 right-6">
-        <a href="/admin/profile" class="bg-[#0a1f44] text-white px-5 py-2 rounded hover:bg-[#122d65] transition">
-          Profile
-        </a>
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div class="bg-white shadow rounded-lg p-6 text-center border border-gray-300">
+        <p class="text-lg font-semibold mb-2">Total Trainees</p>
+        <p class="text-3xl text-[#0a1f44] font-bold">{{ total_trainees }}</p>
       </div>
-
-      <h1 class="text-4xl font-bold mb-6 text-[#0a1f44]">
-        Welcome, {{ user.username }} (Admin)
-      </h1>
-
-      <div class="mb-8 flex space-x-10 text-gray-700 font-semibold text-lg">
-        <div>Total Trainees: <span class="text-[#1f3b8b]">{{ total_trainees }}</span></div>
-        <div>Trainees Without Reports: <span class="text-[#ff7900]">{{ trainees_with_no_reports }}</span></div>
-        <div>Reports Submitted Today: <span class="text-[#3a8d30]">{{ reports_today }}</span></div>
+      <div class="bg-white shadow rounded-lg p-6 text-center border border-gray-300">
+        <p class="text-lg font-semibold mb-2">Trainees Without Reports</p>
+        <p class="text-3xl text-red-600 font-bold">{{ trainees_with_no_reports }}</p>
       </div>
-
-      <p class="text-gray-600 text-lg">
-        Use the sidebar to select a trainee and view detailed information and their reports.
-      </p>
-
-    </main>
-  </div>
-
-  <!-- Trainee Profile & Reports Modal -->
-  <div id="traineeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-8 max-h-[90vh] overflow-auto">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-semibold text-[#0a1f44]">Trainee Details</h2>
-        <button onclick="closeTraineeModal()" class="text-[#ff7900] text-3xl font-bold hover:text-[#cc6600]">&times;</button>
-      </div>
-
-      <!-- Profile Info -->
-      <div class="mb-8">
-        <h3 class="text-xl font-semibold mb-4 text-gray-700 border-b border-gray-300 pb-2">Profile Information</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-gray-800 text-lg">
-          <p><strong>Username:</strong> <span id="modalUsername">...</span></p>
-          <p><strong>Email:</strong> <span id="modalEmail">...</span></p>
-          <p><strong>Phone:</strong> <span id="modalPhone">...</span></p>
-          <p><strong>University:</strong> <span id="modalUniversity">...</span></p>
-          <p><strong>Joined:</strong> <span id="modalCreatedAt">...</span></p>
-        </div>
-      </div>
-
-      <!-- Report Table -->
-      <div>
-        <h3 class="text-xl font-semibold mb-4 text-gray-700 border-b border-gray-300 pb-2">Reports</h3>
-        <table class="w-full table-auto border border-gray-300 text-base">
-          <thead class="bg-[#f3f4f6] text-[#0a1f44]">
-            <tr>
-              <th class="border px-6 py-3 text-left">ID</th>
-              <th class="border px-6 py-3 text-left">Title</th>
-              <th class="border px-6 py-3 text-left">Download</th>
-            </tr>
-          </thead>
-          <tbody id="modalReportsBody" class="text-gray-700">
-            <tr>
-              <td colspan="3" class="text-center py-6 text-gray-400">Loading...</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="bg-white shadow rounded-lg p-6 text-center border border-gray-300">
+        <p class="text-lg font-semibold mb-2">Reports Submitted Today</p>
+        <p class="text-3xl text-green-600 font-bold">{{ reports_today }}</p>
       </div>
     </div>
-  </div>
 
-  <script>
-    // Search trainees in sidebar
-    const searchInput = document.getElementById('searchInput');
-    const traineesList = document.getElementById('traineesList');
-    const traineeItems = traineesList ? traineesList.querySelectorAll('li') : [];
+    <!-- Trainee Table -->
+    <section class="bg-white shadow rounded-lg p-6 overflow-x-auto mb-10 border border-gray-300">
+      <h2 class="text-2xl font-semibold mb-6 text-[#0a1f44]">Trainees in Your Department</h2>
+      <table class="w-full table-auto border-collapse text-left">
+        <thead>
+          <tr class="bg-gray-200 text-gray-700">
+            <th class="px-4 py-3 border">#</th>
+            <th class="px-4 py-3 border">Username</th>
+            <th class="px-4 py-3 border">Department</th>
+            <th class="px-4 py-3 border">University</th>
+            <th class="px-4 py-3 border">Created At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for trainee in trainees %}
+          <tr class="hover:bg-gray-50">
+            <td class="border px-4 py-2">{{ loop.index }}</td>
+            <td class="border px-4 py-2 font-medium">{{ trainee.username }}</td>
+            <td class="border px-4 py-2">{{ trainee.department.name if trainee.department else '—' }}</td>
+            <td class="border px-4 py-2">{{ trainee.university or '—' }}</td>
+            <td class="border px-4 py-2">{{ trainee.created_at.strftime('%Y-%m-%d') if trainee.created_at else '—' }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="border px-4 py-4 text-center text-gray-500">No trainees found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
 
-    searchInput.addEventListener('input', () => {
-      const query = searchInput.value.toLowerCase();
-      traineeItems.forEach(item => {
-        const text = item.textContent.toLowerCase();
-        item.style.display = text.includes(query) ? '' : 'none';
-      });
-    });
+    <!-- Reports Table -->
+    <section class="bg-white shadow rounded-lg p-6 overflow-x-auto border border-gray-300">
+      <h2 class="text-2xl font-semibold mb-6 text-[#0a1f44]">Reports Submitted by Trainees</h2>
+      <table class="w-full table-auto border-collapse text-left">
+        <thead>
+          <tr class="bg-gray-200 text-gray-700">
+            <th class="px-4 py-3 border">#</th>
+            <th class="px-4 py-3 border">Report Title</th>
+            <th class="px-4 py-3 border">Trainee Username</th>
+            <th class="px-4 py-3 border">Submitted At</th>
+            <th class="px-4 py-3 border text-center">Download</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for report in reports %}
+          <tr class="hover:bg-gray-50">
+            <td class="border px-4 py-2">{{ loop.index }}</td>
+            <td class="border px-4 py-2 font-medium">{{ report.title }}</td>
+            <td class="border px-4 py-2">{{ report.trainee.username }}</td>
+            <td class="border px-4 py-2">{{ report.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td class="border px-4 py-2 text-center">
+              <a href="{{ url_for('download_report', report_id=report.id) }}"
+                 class="text-blue-600 hover:underline font-semibold">Download</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="border px-4 py-4 text-center text-gray-500">No reports submitted yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
 
-    // Open trainee modal and load info + reports
-    function openTraineeModal(traineeId) {
-      fetch(`/admin/trainee-info/${traineeId}`)
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('modalUsername').textContent = data.username || '—';
-          document.getElementById('modalEmail').textContent = data.email || '—';
-          document.getElementById('modalPhone').textContent = data.phone || '—';
-          document.getElementById('modalUniversity').textContent = data.university || '—';
-          document.getElementById('modalCreatedAt').textContent = data.created_at || '—';
-
-          const reportsBody = document.getElementById('modalReportsBody');
-          reportsBody.innerHTML = '';
-
-          if (data.reports.length === 0) {
-            reportsBody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-gray-400">No reports submitted.</td></tr>`;
-          } else {
-            data.reports.forEach(report => {
-              const row = document.createElement('tr');
-              row.innerHTML = `
-                <td class="border px-6 py-3">${report.id}</td>
-                <td class="border px-6 py-3">${report.title}</td>
-                <td class="border px-6 py-3">
-                  <button onclick="downloadReport(${report.id})" 
-                          class="bg-[#0a1f44] text-white px-4 py-1 rounded hover:bg-[#122d65] transition">
-                    Browse
-                  </button>
-                </td>
-              `;
-              reportsBody.appendChild(row);
-            });
-          }
-
-          document.getElementById('traineeModal').classList.remove('hidden');
-        })
-        .catch(() => {
-          alert('Failed to load trainee data.');
-        });
-    }
-
-    // Close modal
-    function closeTraineeModal() {
-      document.getElementById('traineeModal').classList.add('hidden');
-    }
-
-    // Download report handler
-    function downloadReport(reportId) {
-      window.location.href = `/download_report/${reportId}`;
-    }
-  </script>
+  </main>
 
   {% include 'footer.html' %}
 </body>
