@@ -19,6 +19,19 @@
 
     <h1 class="text-3xl font-bold text-[#0a1f44] mb-8 text-center">Upload New Course Guide</h1>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="max-w-lg mx-auto mb-6">
+          {% for category, msg in messages %}
+            <div class="p-4 rounded mb-3
+                {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+              {{ msg }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     <!-- Upload Form -->
     <form action="{{ url_for('course_guide_upload') }}" method="POST" enctype="multipart/form-data"
           class="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto mb-10">

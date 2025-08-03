@@ -70,7 +70,6 @@ class Report(db.Model):
 
     trainee = db.relationship('Trainee', backref='reports')
 
-
 class CourseGuide(db.Model):
     __tablename__ = 'course_guides'
     id = db.Column(db.Integer, Sequence('course_guide_id_seq'), primary_key=True)
@@ -98,6 +97,10 @@ def signup():
         role = request.form['role']
         dept_id = request.form.get('department')
 
+        if not dept_id:
+            error = "Department is required"
+            return render_template('signup.html', error=error, departments=departments)
+
         exists = (
             SuperAdmin.query.filter_by(username=username).first() or
             Admin.query.filter_by(username=username).first() or
@@ -107,9 +110,7 @@ def signup():
         if exists:
             error = "❌ Username already exists"
         else:
-            if role == 'superadmin':
-                user = SuperAdmin(username=username, password=password)
-            elif role == 'admin':
+            if role == 'admin':
                 user = Admin(username=username, password=password, department_id=dept_id)
             elif role == 'trainee':
                 user = Trainee(username=username, password=password, department_id=dept_id)
@@ -124,6 +125,30 @@ def signup():
             return redirect(url_for(f'{role}_home'))
 
     return render_template('signup.html', error=error, departments=departments)
+
+@app.route('/create-admin', methods=['GET', 'POST'])
+def create_admin():
+    if session.get('role') != 'superadmin':
+        return redirect(url_for('login'))
+
+    departments = Department.query.all()
+    error = None
+
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        password = request.form['password'].strip()
+        department_id = request.form.get('department')
+
+        if Admin.query.filter_by(username=username).first():
+            error = "Admin username already exists"
+        else:
+            new_admin = Admin(username=username, password=password, department_id=department_id)
+            db.session.add(new_admin)
+            db.session.commit()
+            flash("Admin created successfully.", "success")
+            return redirect(url_for('superadmin_home'))
+
+    return render_template('create_admin.html', departments=departments, error=error)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -165,10 +190,25 @@ def superadmin_home():
 
     user = SuperAdmin.query.filter_by(username=session['user']).first()
     search_query = request.args.get('search', '')
+
     admins = Admin.query.filter(Admin.username.ilike(f"%{search_query}%")).all()
     trainees = Trainee.query.filter(Trainee.username.ilike(f"%{search_query}%")).all()
 
-    return render_template('super_admin_home.html', user=user, admins=admins, trainees=trainees)
+    # Load departments with their course guides eagerly to avoid lazy loading issues
+    departments = Department.query.options(db.joinedload(Department.course_guides)).all()
+
+    # Load all reports to show in reports tab
+    reports = Report.query.order_by(Report.created_at.desc()).all()
+
+    return render_template(
+        'super_admin_home.html',
+        user=user,
+        admins=admins,
+        trainees=trainees,
+        departments=departments,
+        reports=reports
+    )
+
 
 @app.route('/admin-home')
 def admin_home():
@@ -262,9 +302,32 @@ def course_guide_upload():
         db.session.commit()
 
         flash("Course guide uploaded successfully.", "success")
-        return redirect(url_for('admin_home'))
+        return redirect(url_for('course_guide_upload'))
 
-    return render_template('course_guide_upload.html')
+    # GET request: send current guides for this admin's department
+    guides = CourseGuide.query.filter_by(department_id=admin.department_id).order_by(CourseGuide.uploaded_at.desc()).all()
+
+    return render_template('course_guide_upload.html', guides=guides, user=admin)
+
+
+@app.route('/delete_course_guide/<int:guide_id>', methods=['POST'])
+def delete_course_guide(guide_id):
+    if session.get('role') != 'admin' or 'user' not in session:
+        return redirect(url_for('login'))
+
+    admin = Admin.query.filter_by(username=session['user']).first()
+    if not admin:
+        return redirect(url_for('login'))
+
+    guide = CourseGuide.query.get(guide_id)
+    if not guide or guide.department_id != admin.department_id:
+        flash("You are not authorized to delete this guide.", "error")
+        return redirect(url_for('course_guide_upload'))
+
+    db.session.delete(guide)
+    db.session.commit()
+    flash("Course guide deleted successfully.", "success")
+    return redirect(url_for('course_guide_upload'))
 
 @app.route('/download_report/<int:report_id>')
 def download_report(report_id):
@@ -298,6 +361,21 @@ def update_profile():
     trainee.university = request.form.get('university')
     db.session.commit()
     return redirect(url_for('trainee_home'))
+
+@app.route('/delete-admin/<int:admin_id>', methods=['POST'])
+def delete_admin(admin_id):
+    if session.get('role') != 'superadmin':
+        return redirect(url_for('login'))
+
+    admin = Admin.query.get(admin_id)
+    if admin:
+        db.session.delete(admin)
+        db.session.commit()
+        flash("Admin deleted successfully.", "success")
+    else:
+        flash("Admin not found.", "error")
+
+    return redirect(url_for('superadmin_home'))
 
 if __name__ == '__main__':
     with app.app_context():
